@@ -9,9 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { saveBidOutcome } from "@/lib/bid-outcomes";
+import { Select } from "@/components/ui/select";
+import {
+  BID_OUTCOME_REASON_LABELS,
+  BID_OUTCOME_REASONS,
+  isBidOutcomeReasonRequired,
+  saveBidOutcome,
+} from "@/lib/bid-outcomes";
 import { trackEvent } from "@/lib/analytics";
-import type { BidOutcomeRecord, TenderAnalysisResult } from "@/types/analysis";
+import type {
+  BidOutcomeReason,
+  BidOutcomeRecord,
+  TenderAnalysisResult,
+} from "@/types/analysis";
 
 interface BidOutcomeFormProps {
   analysis: TenderAnalysisResult;
@@ -22,17 +32,35 @@ export function BidOutcomeForm({ analysis }: BidOutcomeFormProps) {
     useState<BidOutcomeRecord["outcome"]>("pending");
   const [bidPriceEur, setBidPriceEur] = useState<number | "">("");
   const [notes, setNotes] = useState("");
+  const [reason, setReason] = useState<BidOutcomeReason | "">("");
+  const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
+  const reasonRequired = isBidOutcomeReasonRequired(outcome);
+
   const handleSave = () => {
+    if (reasonRequired && !reason) {
+      setError("Indiquez la raison principale (obligatoire).");
+      setSaved(false);
+      return;
+    }
+
     saveBidOutcome({
       title: analysis.title,
       clientName: analysis.clientName,
       outcome,
       bidPriceEur: bidPriceEur === "" ? undefined : Number(bidPriceEur),
       notes: notes || undefined,
+      reason: reason || undefined,
+      goNoGoScore: analysis.goNoGoScore,
     });
-    trackEvent("bid_outcome_saved", { outcome, title: analysis.title });
+    trackEvent("bid_outcome_saved", {
+      outcome,
+      reason: reason || undefined,
+      score: analysis.goNoGoScore,
+      title: analysis.title,
+    });
+    setError(null);
     setSaved(true);
   };
 
@@ -61,6 +89,7 @@ export function BidOutcomeForm({ analysis }: BidOutcomeFormProps) {
               onClick={() => {
                 setOutcome(value);
                 setSaved(false);
+                setError(null);
               }}
               className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${
                 outcome === value
@@ -72,6 +101,29 @@ export function BidOutcomeForm({ analysis }: BidOutcomeFormProps) {
             </button>
           ))}
         </div>
+        {reasonRequired && (
+          <label className="block space-y-1 text-sm">
+            <span className="text-muted">Raison principale</span>
+            <Select
+              value={reason}
+              onChange={(e) => {
+                setReason(e.target.value as BidOutcomeReason | "");
+                setSaved(false);
+                setError(null);
+              }}
+              className="max-w-xs"
+              required
+              aria-required="true"
+            >
+              <option value="">Choisir…</option>
+              {BID_OUTCOME_REASONS.map((value) => (
+                <option key={value} value={value}>
+                  {BID_OUTCOME_REASON_LABELS[value]}
+                </option>
+              ))}
+            </Select>
+          </label>
+        )}
         <label className="block space-y-1 text-sm">
           <span className="text-muted">Prix proposé (€)</span>
           <input
@@ -92,10 +144,16 @@ export function BidOutcomeForm({ analysis }: BidOutcomeFormProps) {
             placeholder="Ex. perdu sur le prix, gagné après négociation lot 2…"
           />
         </label>
-        <div className="flex items-center gap-2">
-          <Button type="button" size="sm" onClick={handleSave}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSave}
+            disabled={reasonRequired && !reason}
+          >
             Enregistrer l&apos;outcome
           </Button>
+          {error && <span className="text-xs text-danger">{error}</span>}
           {saved && (
             <span className="text-xs text-success">Outcome sauvegardé</span>
           )}

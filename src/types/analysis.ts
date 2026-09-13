@@ -170,6 +170,14 @@ export interface WinSimulationResult {
   breakEvenPrice: number;
 }
 
+export type BidOutcomeReason =
+  | "price"
+  | "certification"
+  | "references"
+  | "capacity"
+  | "deadline"
+  | "other";
+
 export interface BidOutcomeRecord {
   id: string;
   title: string;
@@ -177,6 +185,8 @@ export interface BidOutcomeRecord {
   outcome: "won" | "lost" | "passed" | "pending";
   bidPriceEur?: number;
   notes?: string;
+  reason?: BidOutcomeReason;
+  goNoGoScore?: number;
   createdAt: string;
 }
 

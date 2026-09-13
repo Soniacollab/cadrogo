@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { BidOutcomeForm } from "@/components/bid-outcome-form";
 import { DecisionCharts } from "@/components/charts/decision-charts";
+import { ComplianceMatrix } from "@/components/compliance-matrix";
+import { DecisionScenariosPanel } from "@/components/decision-scenarios-panel";
 import { WinEnginePanel } from "@/components/win-engine-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -313,6 +315,9 @@ export function AnalysisDashboard({
           <CardDescription>{data.goNoGoReason}</CardDescription>
         </CardHeader>
       </Card>
+
+      <ComplianceMatrix analysis={data} />
+      <DecisionScenariosPanel analysis={data} />
 
       <Tabs defaultValue="risks">
         <TabsList>
