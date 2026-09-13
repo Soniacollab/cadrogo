@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trackEvent } from "@/lib/analytics";
 import { readCompanyProfile } from "@/lib/company-profile";
+import { buildDemoAnalysis, DEMO_ESN_PROFILE } from "@/lib/demo-analysis";
 import type {
   AnalysisAppState,
   AnalyzeApiError,
@@ -33,6 +34,7 @@ export default function HomePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [accessCode, setAccessCode] = useState("");
+  const [isDemo, setIsDemo] = useState(false);
   const [profile, setProfile] = useState<CompanyProfile>(() =>
     typeof window === "undefined" ? readCompanyProfile() : readCompanyProfile()
   );
@@ -61,6 +63,7 @@ export default function HomePage() {
   const handleAnalyze = async (file: File) => {
     setAppState("analyzing");
     setErrorMessage(null);
+    setIsDemo(false);
     setAnalysis(null);
     trackEvent("analyze_started", {
       fileName: file.name,
@@ -114,9 +117,21 @@ export default function HomePage() {
   const resetView = () => {
     setAppState("idle");
     setAnalysis(null);
+    setIsDemo(false);
     setErrorMessage(null);
     setStepIndex(0);
     trackEvent("analyze_reset");
+  };
+
+  const handleTryDemo = () => {
+    setErrorMessage(null);
+    setIsDemo(true);
+    setAnalysis(buildDemoAnalysis());
+    setAppState("result");
+    trackEvent("demo_example_opened", { title: "CHU Nantes" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
@@ -124,18 +139,26 @@ export default function HomePage() {
       <div className="mx-auto w-full max-w-6xl px-5 py-5 sm:px-6 sm:py-6">
         {(appState === "idle" || appState === "error") && (
           <section className="animate-fade-in space-y-6 pb-10">
-            <div className="max-w-2xl space-y-1.5">
+            <div className="max-w-2xl space-y-3">
               <p className="text-sm font-medium text-accent">
-                Vertical IT · marchés publics FR
+                Go/No-Go personnalisé pour votre ESN
               </p>
               <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                Auditer un appel d&apos;offres &amp; simuler votre rentabilité
+                Est-ce que votre entreprise IT doit répondre à cet AO&nbsp;?
               </h1>
               <p className="text-sm leading-relaxed text-muted sm:text-base">
-                Win-Engine calibré à votre TJM, citations page, exposition € des
-                pénalités et comparables BeauAMP — pour décider Go / No-Go comme
-                un DG, pas comme un lecteur PDF.
+                Cadrogo ne résume pas le DCE pour tout le monde. Il croise les
+                exigences avec votre profil (certifs, références, capacité) et
+                dit pourquoi c&apos;est GO, À VÉRIFIER ou NO-GO.
               </p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Button type="button" onClick={handleTryDemo}>
+                  Essayer un exemple
+                </Button>
+                <p className="text-xs text-muted">
+                  AO type CHU Nantes · sans PDF ni clé API
+                </p>
+              </div>
             </div>
 
             <CompanyProfilePanel onChange={setProfile} />
@@ -172,6 +195,16 @@ export default function HomePage() {
             )}
 
             <PdfUploader onAnalyze={handleAnalyze} isAnalyzing={false} />
+            <p className="text-sm text-muted">
+              Pas de DCE sous la main&nbsp;?{" "}
+              <button
+                type="button"
+                onClick={handleTryDemo}
+                className="font-medium text-accent underline-offset-2 hover:underline"
+              >
+                Essayer un exemple
+              </button>
+            </p>
           </section>
         )}
 
@@ -207,22 +240,26 @@ export default function HomePage() {
         )}
 
         {appState === "result" && analysis && (
-          <section className="animate-fade-in space-y-3 pb-10">
+          <section className="animate-fade-in scroll-mt-16 space-y-3 pb-10">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
                   Synthèse du dossier
                 </h1>
                 <p className="mt-0.5 text-sm text-muted">
-                  Décision calibrée · exposition financière · win/loss à tracer
+                  Go/No-Go personnalisé pour votre ESN · win/loss à tracer
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={resetView}>
                 <RotateCcw className="h-3.5 w-3.5" />
-                Analyser un autre PDF
+                {isDemo ? "Retour à l'accueil" : "Analyser un autre PDF"}
               </Button>
             </div>
-            <AnalysisDashboard data={analysis} profile={profile} />
+            <AnalysisDashboard
+              data={analysis}
+              profile={isDemo ? DEMO_ESN_PROFILE : profile}
+              isDemo={isDemo}
+            />
           </section>
         )}
       </div>

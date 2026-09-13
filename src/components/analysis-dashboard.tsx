@@ -28,6 +28,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from "@/lib/analytics";
 import { readCompanyProfile } from "@/lib/company-profile";
 import { openDecisionNotePrint } from "@/lib/decision-note-export";
+import {
+  buildVerdictReasons,
+  PROJECTED_VERDICT_LABELS,
+  verdictFromScore,
+  type ProjectedVerdict,
+} from "@/lib/decision-scenarios";
 import { exportAnalysisToExcel } from "@/lib/excel-export";
 import { cn } from "@/lib/utils";
 import type {
@@ -41,34 +47,15 @@ import type {
 interface AnalysisDashboardProps {
   data: TenderAnalysisResult;
   profile?: CompanyProfile;
+  isDemo?: boolean;
 }
 
 type RequirementFilter = "all" | "mandatory" | "optional" | RequirementCategory;
 
-function scorePresentation(score: number): {
-  label: string;
-  description: string;
-  tone: "go" | "caution" | "nogo";
-} {
-  if (score >= 75) {
-    return {
-      label: "Répondre",
-      description: "Le dossier semble jouable",
-      tone: "go",
-    };
-  }
-  if (score >= 50) {
-    return {
-      label: "À vérifier",
-      description: "Plusieurs points méritent attention",
-      tone: "caution",
-    };
-  }
-  return {
-    label: "S'abstenir",
-    description: "Risques trop élevés ou critères éliminatoires",
-    tone: "nogo",
-  };
+function verdictTone(verdict: ProjectedVerdict): "go" | "caution" | "nogo" {
+  if (verdict === "go") return "go";
+  if (verdict === "review") return "caution";
+  return "nogo";
 }
 
 function severityLabel(severity: RiskSeverity): string {
@@ -127,6 +114,7 @@ function isLegalClause(type: string): boolean {
 export function AnalysisDashboard({
   data,
   profile: profileProp,
+  isDemo = false,
 }: AnalysisDashboardProps) {
   const [requirementFilter, setRequirementFilter] =
     useState<RequirementFilter>("all");
@@ -134,7 +122,9 @@ export function AnalysisDashboard({
     profileProp ?? readCompanyProfile()
   );
   const [simulation, setSimulation] = useState<WinSimulationResult | null>(null);
-  const verdict = scorePresentation(data.goNoGoScore);
+  const projectedVerdict = verdictFromScore(data.goNoGoScore);
+  const tone = verdictTone(projectedVerdict);
+  const verdictReasons = useMemo(() => buildVerdictReasons(data, 3), [data]);
 
   useEffect(() => {
     if (profileProp) setProfile(profileProp);
@@ -176,56 +166,77 @@ export function AnalysisDashboard({
 
   return (
     <div className="space-y-3 animate-fade-in">
+      {isDemo && (
+        <div className="rounded-md border border-accent/30 bg-accent/5 px-3 py-2 text-sm text-foreground">
+          Exemple — ESN IT type (ISO 27001, sans HDS ni SecNumCloud) face à un
+          AO CHU Nantes. Aucune clé API n&apos;a été utilisée.
+        </div>
+      )}
       <Card>
-        <CardHeader className="gap-3 space-y-0 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-1.5">
+        <CardHeader className="space-y-3">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Badge variant="secondary">IT · marchés publics</Badge>
-            <CardTitle className="text-lg sm:text-xl">{data.title}</CardTitle>
-            <CardDescription className="max-w-2xl">{data.summary}</CardDescription>
+            {isDemo && <Badge variant="outline">Exemple</Badge>}
           </div>
-          <div className="flex flex-col gap-2 sm:items-end">
-            <div
-              className={cn(
-                "min-w-[170px] rounded-md border px-3 py-2.5",
-                verdict.tone === "go" && "border-success/30 bg-success/10 text-success",
-                verdict.tone === "caution" &&
-                  "border-warning/30 bg-warning/10 text-warning",
-                verdict.tone === "nogo" && "border-danger/30 bg-danger/10 text-danger"
-              )}
-            >
-              <p className="text-2xs font-medium uppercase tracking-wide opacity-70">
-                Intérêt à répondre
+          <CardTitle className="text-lg sm:text-xl">{data.title}</CardTitle>
+          <CardDescription className="max-w-2xl">{data.summary}</CardDescription>
+          <div
+            className={cn(
+              "rounded-lg border-2 px-3 py-3 sm:px-4 sm:py-4",
+              tone === "go" && "border-success/50 bg-success/10 text-success",
+              tone === "caution" && "border-warning/50 bg-warning/10 text-warning",
+              tone === "nogo" && "border-danger/50 bg-danger/10 text-danger"
+            )}
+          >
+            <p className="text-2xs font-semibold uppercase tracking-wide opacity-80">
+              Go/No-Go personnalisé pour votre ESN
+            </p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p className="text-3xl font-bold tracking-tight sm:text-4xl">
+                {PROJECTED_VERDICT_LABELS[projectedVerdict]}
               </p>
-              <p className="mt-0.5 text-2xl font-semibold tabular-nums">
+              <p className="text-xl font-semibold tabular-nums sm:text-2xl">
                 {data.goNoGoScore}
-                <span className="text-sm font-normal opacity-50">/100</span>
-              </p>
-              <p className="mt-1 text-xs">
-                {verdict.label} · {verdict.description}
+                <span className="text-sm font-normal opacity-60">/100</span>
               </p>
             </div>
-            <div
-              className={cn(
-                "min-w-[170px] rounded-md border px-3 py-2.5 text-sm",
-                data.financialExposure.hasUnlimitedExposure
-                  ? "border-danger/40 bg-danger/10 text-danger"
-                  : "border-warning/30 bg-warning/10 text-warning"
-              )}
-            >
-              <p className="text-2xs font-medium uppercase tracking-wide opacity-70">
-                Exposition €
-              </p>
-              <p className="mt-1 font-semibold">
-                {data.financialExposure.hasUnlimitedExposure
-                  ? "Illimitée"
-                  : data.financialExposure.maxExposureEur != null
-                    ? `~ ${data.financialExposure.maxExposureEur.toLocaleString("fr-FR")} €`
-                    : "Non chiffrée"}
-              </p>
-              <p className="mt-1 text-xs opacity-90">
-                {data.financialExposure.summary}
-              </p>
-            </div>
+            <p className="mt-2 text-sm leading-relaxed text-foreground">
+              {data.goNoGoReason}
+            </p>
+            {verdictReasons.length > 0 && (
+              <ol className="mt-3 space-y-1.5 text-sm text-foreground">
+                {verdictReasons.map((reason, index) => (
+                  <li key={reason} className="flex gap-2">
+                    <span className="font-semibold tabular-nums opacity-70">
+                      {index + 1}.
+                    </span>
+                    <span>{reason}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+          <div
+            className={cn(
+              "rounded-md border px-3 py-2.5 text-sm",
+              data.financialExposure.hasUnlimitedExposure
+                ? "border-danger/40 bg-danger/10 text-danger"
+                : "border-warning/30 bg-warning/10 text-warning"
+            )}
+          >
+            <p className="text-2xs font-medium uppercase tracking-wide opacity-70">
+              Exposition €
+            </p>
+            <p className="mt-1 font-semibold">
+              {data.financialExposure.hasUnlimitedExposure
+                ? "Illimitée"
+                : data.financialExposure.maxExposureEur != null
+                  ? `~ ${data.financialExposure.maxExposureEur.toLocaleString("fr-FR")} €`
+                  : "Non chiffrée"}
+            </p>
+            <p className="mt-1 text-xs opacity-90">
+              {data.financialExposure.summary}
+            </p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-2 sm:grid-cols-3">
@@ -308,13 +319,6 @@ export function AnalysisDashboard({
           </CardContent>
         </Card>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Pourquoi ce score</CardTitle>
-          <CardDescription>{data.goNoGoReason}</CardDescription>
-        </CardHeader>
-      </Card>
 
       <ComplianceMatrix analysis={data} />
       <DecisionScenariosPanel analysis={data} />

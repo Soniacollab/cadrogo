@@ -13,9 +13,9 @@ const plexSans = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Cadrogo — Audit d'appels d'offres",
+  title: "Cadrogo — Go/No-Go personnalisé pour votre ESN",
   description:
-    "Auditez un cahier des charges PDF, simulez la rentabilité et décidez Go / No-Go avant d'engager une réponse.",
+    "Est-ce que votre ESN IT doit répondre à cet appel d'offres ? Matrice de conformité, verdict argumenté et scénarios de bascule.",
 };
 
 export default function RootLayout({

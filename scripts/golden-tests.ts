@@ -8,6 +8,14 @@ import {
   enrichRiskFinancials,
   parseBudgetValue,
 } from "../src/lib/financial-exposure";
+import { buildDemoAnalysis } from "../src/lib/demo-analysis";
+import {
+  buildComplianceRows,
+  buildDecisionScenarios,
+  buildVerdictReasons,
+  complianceSummary,
+  verdictFromScore,
+} from "../src/lib/decision-scenarios";
 import { simulateWinEngine } from "../src/lib/win-engine";
 import { computeWinPrior, findComparables } from "../src/lib/win-model";
 import type {
@@ -173,6 +181,27 @@ function testNoGoSimulation() {
   assert.equal(analysis.financialExposure.hasUnlimitedExposure, true);
 }
 
+function testDemoNantesDecision() {
+  const analysis = buildDemoAnalysis();
+  assert.equal(verdictFromScore(analysis.goNoGoScore), "review");
+  const reasons = buildVerdictReasons(analysis, 3);
+  assert.ok(reasons.length > 0 && reasons.length <= 3);
+  assert.ok(reasons.some((r) => /hds/i.test(r)));
+  const summary = complianceSummary(buildComplianceRows(analysis));
+  assert.ok(summary.missing >= 3);
+  assert.ok(summary.mandatoryMissing >= 2);
+  const scenarios = buildDecisionScenarios(analysis);
+  const ids = scenarios.map((s) => s.id);
+  assert.ok(ids.includes("hds"));
+  assert.ok(ids.includes("secnumcloud"));
+  assert.ok(ids.includes("references"));
+  assert.ok(ids.includes("rgaa"));
+  assert.ok(!ids.includes("iso27001"));
+  const hds = scenarios.find((s) => s.id === "hds");
+  assert.ok(hds);
+  assert.equal(hds!.projectedVerdict, "go");
+}
+
 function testComparables() {
   const analysis = baseAnalysis();
   const comps = findComparables(analysis, 5);
@@ -187,6 +216,7 @@ function main() {
   testGoSimulation();
   testNoGoSimulation();
   testComparables();
+  testDemoNantesDecision();
   console.log("OK — golden tests passed");
 }
 

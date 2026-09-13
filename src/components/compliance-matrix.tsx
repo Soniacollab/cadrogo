@@ -42,13 +42,13 @@ export function ComplianceMatrix({ analysis }: ComplianceMatrixProps) {
         <CardDescription>
           {summary.total} exigence{summary.total > 1 ? "s" : ""}
           {summary.missing > 0
-            ? ` · ${summary.missing} manquant${summary.missing > 1 ? "s" : ""}`
+            ? ` · ${summary.missing} manquante${summary.missing > 1 ? "s" : ""}`
             : ""}
           {summary.unknown > 0
             ? ` · ${summary.unknown} à vérifier`
             : ""}
           {summary.mandatoryMissing > 0
-            ? ` · ${summary.mandatoryMissing} obligatoire${summary.mandatoryMissing > 1 ? "s" : ""} non couvert${summary.mandatoryMissing > 1 ? "s" : ""}`
+            ? ` · ${summary.mandatoryMissing} obligatoire${summary.mandatoryMissing > 1 ? "s" : ""} non couverte${summary.mandatoryMissing > 1 ? "s" : ""}`
             : ""}
         </CardDescription>
       </CardHeader>

@@ -157,6 +157,41 @@ export function buildComplianceRows(
   }));
 }
 
+export function buildVerdictReasons(
+  analysis: TenderAnalysisResult,
+  max = 3
+): string[] {
+  const reasons: string[] = [];
+  const seen = new Set<string>();
+
+  const push = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || reasons.length >= max) return;
+    const key = trimmed.toLowerCase().replace(/\s+/g, " ").slice(0, 56);
+    if (seen.has(key)) return;
+    seen.add(key);
+    reasons.push(trimmed);
+  };
+
+  for (const req of analysis.requirements) {
+    if (req.isMandatory && gapOf(req) === "missing") {
+      push(req.gapReason || req.description);
+    }
+  }
+
+  const rankedRisks = [...analysis.riskFactors].sort((a, b) => {
+    const order = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+    return order[a.severity] - order[b.severity];
+  });
+  for (const risk of rankedRisks) {
+    if (risk.severity === "CRITICAL" || risk.severity === "HIGH") {
+      push(risk.description);
+    }
+  }
+
+  return reasons;
+}
+
 export function complianceSummary(rows: ComplianceRow[]): ComplianceSummary {
   return {
     total: rows.length,

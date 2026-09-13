@@ -16,7 +16,7 @@ export function AppHeader() {
         </a>
         <div className="flex items-center gap-3">
           <span className="hidden text-xs text-muted sm:inline">
-            Version test · IT marchés publics
+            Go/No-Go personnalisé · ESN IT
           </span>
           <ThemeToggle />
         </div>
