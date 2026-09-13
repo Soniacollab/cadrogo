@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
-import { Outfit, Source_Sans_3 } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
+import { AppHeader } from "@/components/app-header";
+import { ThemeProvider } from "@/components/theme-provider";
+import { themeBootScript } from "@/lib/theme-boot";
 import "./globals.css";
 
-const outfit = Outfit({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "TenderPulse — Analyse Go/No-Go des Appels d'Offres",
+  title: "Cadrogo — Audit d'appels d'offres",
   description:
-    "Micro-SaaS B2B pour analyser un PDF d'Appel d'Offres en moins de 2 minutes : score Go/No-Go, exigences, risques et export Excel.",
+    "Auditez un cahier des charges PDF, simulez la rentabilité et décidez Go / No-Go avant d'engager une réponse.",
 };
 
 export default function RootLayout({
@@ -26,11 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" className="light" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body
-        className={`${outfit.variable} ${sourceSans.variable} font-sans antialiased`}
+        className={`${plexSans.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
       >
-        {children}
+        <ThemeProvider>
+          <AppHeader />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

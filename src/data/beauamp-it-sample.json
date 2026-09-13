@@ -1,0 +1,134 @@
+[
+  {
+    "id": "amp-it-001",
+    "buyerName": "Ville de Nantes",
+    "title": "Refonte portail usager et maintenance",
+    "cpv": "72212200",
+    "awardValueEur": 265000,
+    "estimatedValueEur": 280000,
+    "awardYear": 2024,
+    "winnerSizeBand": "PME",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-002",
+    "buyerName": "Métropole de Lyon",
+    "title": "Développement application métiers",
+    "cpv": "72222300",
+    "awardValueEur": 410000,
+    "estimatedValueEur": 450000,
+    "awardYear": 2023,
+    "winnerSizeBand": "ETI",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-003",
+    "buyerName": "Région Pays de la Loire",
+    "title": "Hébergement SecNumCloud et infogérance",
+    "cpv": "72000000",
+    "awardValueEur": 620000,
+    "estimatedValueEur": 700000,
+    "awardYear": 2024,
+    "winnerSizeBand": "ETI",
+    "procedureType": "Restreint"
+  },
+  {
+    "id": "amp-it-004",
+    "buyerName": "Ville de Rennes",
+    "title": "Accessibilité RGAA et refonte sites",
+    "cpv": "72400000",
+    "awardValueEur": 185000,
+    "estimatedValueEur": 200000,
+    "awardYear": 2022,
+    "winnerSizeBand": "PME",
+    "procedureType": "MAPA"
+  },
+  {
+    "id": "amp-it-005",
+    "buyerName": "Département de Loire-Atlantique",
+    "title": "Maintenance applicative SI social",
+    "cpv": "72267100",
+    "awardValueEur": 312000,
+    "estimatedValueEur": 340000,
+    "awardYear": 2023,
+    "winnerSizeBand": "PME",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-006",
+    "buyerName": "Nantes Métropole",
+    "title": "API et modernisation back-office",
+    "cpv": "72212200",
+    "awardValueEur": 298000,
+    "estimatedValueEur": 320000,
+    "awardYear": 2025,
+    "winnerSizeBand": "PME",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-007",
+    "buyerName": "Ville de Bordeaux",
+    "title": "Portail citoyen mobile",
+    "cpv": "72212200",
+    "awardValueEur": 240000,
+    "estimatedValueEur": 260000,
+    "awardYear": 2024,
+    "winnerSizeBand": "TPE",
+    "procedureType": "MAPA"
+  },
+  {
+    "id": "amp-it-008",
+    "buyerName": "Ministère de l'Intérieur",
+    "title": "Prestations développement sécurisé",
+    "cpv": "72000000",
+    "awardValueEur": 980000,
+    "estimatedValueEur": 1100000,
+    "awardYear": 2023,
+    "winnerSizeBand": "GE",
+    "procedureType": "Restreint"
+  },
+  {
+    "id": "amp-it-009",
+    "buyerName": "Ville d'Angers",
+    "title": "TMA Drupal et évolutions",
+    "cpv": "72267100",
+    "awardValueEur": 156000,
+    "estimatedValueEur": 170000,
+    "awardYear": 2022,
+    "winnerSizeBand": "PME",
+    "procedureType": "MAPA"
+  },
+  {
+    "id": "amp-it-010",
+    "buyerName": "Communauté urbaine de Dunkerque",
+    "title": "SI rh et intranet",
+    "cpv": "72222300",
+    "awardValueEur": 275000,
+    "estimatedValueEur": 300000,
+    "awardYear": 2024,
+    "winnerSizeBand": "PME",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-011",
+    "buyerName": "Ville de Toulouse",
+    "title": "Cloud souverain et supervision",
+    "cpv": "72510000",
+    "awardValueEur": 540000,
+    "estimatedValueEur": 580000,
+    "awardYear": 2025,
+    "winnerSizeBand": "ETI",
+    "procedureType": "Ouvert"
+  },
+  {
+    "id": "amp-it-012",
+    "buyerName": "Région Bretagne",
+    "title": "Assistance à maîtrise d'ouvrage SI",
+    "cpv": "72220000",
+    "awardValueEur": 190000,
+    "estimatedValueEur": 210000,
+    "awardYear": 2023,
+    "winnerSizeBand": "PME",
+    "procedureType": "Ouvert"
+  }
+]

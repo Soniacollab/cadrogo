@@ -51,7 +51,7 @@ export function exportAnalysisToExcel(data: TenderAnalysisResult): void {
     .trim()
     .replace(/\s+/g, "_")
     .slice(0, 40);
-  const filename = `TenderPulse_${safeTitle || "analyse"}_${Date.now()}.xlsx`;
+  const filename = `Cadrogo_${safeTitle || "analyse"}_${Date.now()}.xlsx`;
 
   XLSX.writeFile(workbook, filename);
 }

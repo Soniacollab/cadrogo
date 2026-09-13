@@ -2,37 +2,143 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --brand: #0d9488;
-  --brand-dark: #0f172a;
-}
+@layer base {
+  :root,
+  html.light {
+    --background: #e7ebf0;
+    --foreground: #152033;
+    --surface: #f4f6f8;
+    --surface-muted: #dce2ea;
+    --border: #c5ced9;
+    --muted: #5b6778;
+    --primary: #1e3a5f;
+    --primary-hover: #152a46;
+    --primary-foreground: #f4f6f8;
+    --accent: #1e6b55;
+    --danger: #b42318;
+    --warning: #b54708;
+    --success: #067647;
+    --shadow: 0 1px 2px rgba(21, 32, 51, 0.06), 0 8px 24px rgba(21, 32, 51, 0.06);
+    --ring: rgba(30, 58, 95, 0.35);
+    --chart-1: #1e3a5f;
+    --chart-2: #1e6b55;
+    --chart-3: #5b6778;
+    --chart-4: #8b95a5;
+    --chart-5: #3d7ea6;
+    --chart-grid: #c5ced9;
+    --chart-tooltip-bg: #f4f6f8;
+    --chart-tooltip-fg: #152033;
+    --page-glow: radial-gradient(
+      120% 80% at 10% -10%,
+      rgba(30, 107, 85, 0.12),
+      transparent 55%
+    ),
+      radial-gradient(
+        90% 70% at 100% 0%,
+        rgba(30, 58, 95, 0.1),
+        transparent 50%
+      );
+  }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-sans), "Source Sans 3", ui-sans-serif, sans-serif;
-}
+  html.dark {
+    --background: #141820;
+    --foreground: #e8edf4;
+    --surface: #1c222d;
+    --surface-muted: #262e3b;
+    --border: #343e4f;
+    --muted: #9aa6b8;
+    --primary: #d7e2f0;
+    --primary-hover: #f0f4f8;
+    --primary-foreground: #141820;
+    --accent: #3d9b7a;
+    --danger: #f97066;
+    --warning: #fdb022;
+    --success: #47cd89;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.28);
+    --ring: rgba(61, 155, 122, 0.4);
+    --chart-1: #6ea8d8;
+    --chart-2: #3d9b7a;
+    --chart-3: #e8edf4;
+    --chart-4: #6b7789;
+    --chart-5: #9aa6b8;
+    --chart-grid: #343e4f;
+    --chart-tooltip-bg: #1c222d;
+    --chart-tooltip-fg: #e8edf4;
+    --page-glow: radial-gradient(
+      100% 70% at 0% 0%,
+      rgba(61, 155, 122, 0.12),
+      transparent 50%
+    ),
+      radial-gradient(
+        80% 60% at 100% 0%,
+        rgba(110, 168, 216, 0.1),
+        transparent 45%
+      );
+  }
 
-.font-display {
-  font-family: var(--font-display), Outfit, ui-sans-serif, sans-serif;
+  html {
+    font-size: 15px;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    color: var(--foreground);
+    background-color: var(--background);
+    background-image: var(--page-glow);
+    background-attachment: fixed;
+    font-family: var(--font-sans), "IBM Plex Sans", ui-sans-serif, system-ui,
+      sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bg-background {
+    background-color: var(--background) !important;
+  }
+
+  .bg-surface {
+    background-color: var(--surface) !important;
+  }
+
+  .bg-surface-muted {
+    background-color: var(--surface-muted) !important;
+  }
+
+  .text-foreground {
+    color: var(--foreground) !important;
+  }
+
+  .text-muted {
+    color: var(--muted) !important;
+  }
+
+  .border-line {
+    border-color: var(--border) !important;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .animate-fade-in {
+    animation: fade-in 280ms ease-out both;
   }
 
-  .animate-fade-in {
-    animation: fade-in 420ms ease-out both;
+  .shadow-panel {
+    box-shadow: var(--shadow);
   }
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
